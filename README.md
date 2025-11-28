@@ -109,26 +109,51 @@ event-stream-pipeline/
 
 ## ▶️ How to Run Locally
 
+### 1. Clone the repository
+
 ```bash
-# 1. Clone the repository
 git clone https://github.com/DeepthiPalle381/event-stream-pipeline.git
 cd event-stream-pipeline
 
-# 2. Create & activate a virtual environment (Windows)
+```
+
+### 2. Create & activate a virtual environment (Windows)
+
+```bash
 python -m venv .venv
 .venv\Scripts\activate
 
-# 3. Install dependencies
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 
-# 4. Run Bronze ingestion (raw → bronze)
+```
+
+### 4. Run Bronze ingestion (raw → bronze)
+
+```bash
 python src/ingest/ingest_events.py
 
-# 5. Run Silver transform (bronze → silver)
+```
+
+### 5. Run Silver transform (bronze → silver)
+
+```bash
 python src/transform/transform_events.py
 
-# 6. Run Gold aggregation (silver → gold)
+```
+
+### 6. Run Gold aggregation (silver → gold)
+
+```bash
 python src/transform/build_gold_tables.py
 
-# 7. Run tests
+```
+
+### 7. Run tests
+
+```bash
 pytest
