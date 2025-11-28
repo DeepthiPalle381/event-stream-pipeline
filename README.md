@@ -1,21 +1,106 @@
 # Event Stream Pipeline (User Activity Logs)
 
-This project simulates a streaming-style data pipeline for user activity logs (clickstream / e-commerce events). It processes time-stamped events in micro-batches, builds session-level and aggregated metrics, and applies data quality checks.
+This project simulates a streaming-style data pipeline for user activity / clickstream events.  
+It builds Bronze, Silver, and Gold data layers on top of an events dataset and computes session-level and aggregated metrics.
 
-## Goals
-- Ingest raw event data
-- Build bronze, silver, and gold layers
-- Compute time-based metrics (events per minute/hour)
-- Build funnels (view → cart → purchase)
-- Add data quality tests and orchestration
+---
 
-## Tech Stack
-- Python (Pandas)
-- SQL
-- Pytest
-- Airflow (optional, later)
+## 🚀 Goals
 
-## Data
-The dataset comes from [Kaggle ...] (add exact name later).
-Place the events file in `data/raw/events_raw.csv`.
+- Ingest raw event logs and partition them into a Bronze layer
+- Clean and standardize events into a Silver layer
+- Build sessionized views of user behaviour
+- Aggregate metrics in a Gold layer (events per minute, event type counts, funnels)
+- Add data quality tests and orchestration via an Airflow DAG
 
+---
+
+## 🧰 Tech Stack
+
+- **Python** (Pandas)
+- **Pytest** (data quality tests)
+- **SQL** (optional analytics)
+- **Apache Airflow** (orchestration – DAG only)
+- **Git / GitHub**
+
+---
+
+## 📦 Data
+
+- Source: public events / clickstream dataset from Kaggle (e-commerce behaviour / event logs).
+- Raw sample stored at: `data/raw/events_raw.csv`  
+  (Full dataset is larger and not pushed to GitHub.)
+
+Key columns used:
+
+- `event_time` – timestamp of the event  
+- `user_id` – user identifier  
+- `event_type` – type of action (view, cart, purchase, etc.)  
+- (plus product/category columns depending on the dataset)
+
+---
+
+## 🧱 Architecture
+
+Layers:
+
+1. **Raw**  
+   - `data/raw/events_raw.csv` (sample of the full dataset)
+
+2. **Bronze (src/ingest/ingest_events.py)**  
+   - Reads raw events  
+   - Parses timestamps  
+   - Partitions events by date into `data/bronze/events_YYYY-MM-DD.csv`
+
+3. **Silver (src/transform/transform_events.py)**  
+   - Loads all Bronze files  
+   - Standardizes `event_type` values  
+   - Calculates per-user sessions (new session if gap > 30 min)  
+   - Outputs:
+     - `data/silver/events_silver.csv`
+     - `data/silver/sessions.csv`
+
+4. **Gold (src/transform/build_gold_tables.py)**  
+   - Uses Silver events to create:
+     - `data/gold/events_by_minute.csv`
+     - `data/gold/events_by_type.csv`
+     - `data/gold/user_funnel.csv`
+
+5. **Orchestration (dags/event_stream_dag.py)**  
+   - Airflow DAG with tasks:
+     - `ingest_bronze_events`
+     - `build_silver_layer`
+     - `build_gold_layer`
+
+6. **Data Quality (tests/)**  
+   - Validates:
+     - sessions have start/end
+     - session length is non-negative
+     - gold tables have valid counts and user_id column
+
+---
+
+## 📂 Project Structure
+
+```text
+event-stream-pipeline/
+├── data/
+│   ├── raw/
+│   │   ├── events_raw.csv        # sampled dataset
+│   │   └── events_raw_full.csv   # full dataset (ignored in git)
+│   ├── bronze/                   # partitioned by date
+│   ├── silver/                   # cleaned + sessions
+│   └── gold/                     # aggregated metrics
+├── src/
+│   ├── ingest/
+│   │   └── ingest_events.py
+│   └── transform/
+│       ├── transform_events.py
+│       └── build_gold_tables.py
+├── tests/
+│   ├── test_silver_layer.py
+│   └── test_gold_layer.py
+├── dags/
+│   └── event_stream_dag.py
+├── requirements.txt
+└── README.md
