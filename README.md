@@ -105,6 +105,8 @@ event-stream-pipeline/
 ├── requirements.txt
 └── README.md
 
+```
+
 ## ▶️ How to Run Locally
 
 ```bash
