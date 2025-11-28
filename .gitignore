@@ -1,0 +1,17 @@
+# Ignore full raw dataset
+data/raw/events_raw_full.csv
+
+# Ignore large files or archives
+data/raw/*.zip
+data/raw/*.parquet
+*.zip
+*.parquet
+
+# Ignore Python virtual environment
+.venv/
+env/
+__pycache__/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
